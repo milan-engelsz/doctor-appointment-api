@@ -57,7 +57,7 @@ class Availability extends Model
 
     public function scopeOrdered($query)
     {
-        return $query->oldest('starts_at');
+        return $query->oldest('starts_at')->oldest('id');
     }
 
     public function getSlots(): Collection

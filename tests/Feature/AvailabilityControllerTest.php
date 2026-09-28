@@ -3,6 +3,7 @@
 use App\Models\Availability;
 use App\Models\Doctor;
 use App\Support\ApiDateTime;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 
@@ -123,6 +124,23 @@ describe('index', function () {
                 fn (Availability $availability) => availabilityResourceMap($availability)
             )->toArray());
 
+    });
+
+    test('returns equal starts_at availabilities in id order', function () {
+        $doctor = Doctor::factory()->create();
+        $day = CarbonImmutable::parse('2026-10-06');
+
+        $earlier = Availability::factory()->for($doctor)->windowOn($day, '15:00')->create();
+        $later = Availability::factory()->for($doctor)->windowOn($day, '15:00')->create();
+
+        $response = $this->getJson(route('doctors.availabilities.index', $doctor));
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data', [
+                availabilityResourceMap($earlier),
+                availabilityResourceMap($later),
+            ]);
     });
 
     test('returns the empty availability list', function () {
