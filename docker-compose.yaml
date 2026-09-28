@@ -1,0 +1,52 @@
+services:
+    db:
+        image: mariadb:10.11
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: laravel
+        volumes:
+            - ./docker/mariadb-init.sql:/docker-entrypoint-initdb.d/99-testing.sql:ro
+
+    db-admin:
+        image: phpmyadmin:latest
+        restart: unless-stopped
+        ports:
+            - "8081:80"
+        environment:
+            PMA_HOST: db
+            PMA_USER: laravel
+            PMA_PASSWORD: laravel
+        depends_on:
+            - db
+
+    app:
+        image: serversideup/php:8.5-fpm-apache
+        ports:
+            - "8080:8080"
+            - "8443:8443"
+        volumes:
+            - ./:/var/www/html
+            - ./docker/app-entrypoint.sh:/etc/entrypoint.d/99-laravel.sh
+        environment:
+            SSL_MODE: "mixed"
+            DB_CONNECTION: "mariadb"
+            DB_HOST: "db"
+            DB_PORT: 3306
+            DB_USERNAME: "laravel"
+            DB_PASSWORD: "laravel"
+        depends_on:
+            - db
+
+    swagger-ui:
+        image: swaggerapi/swagger-ui
+        ports:
+            - "8082:8080"
+        environment:
+            URL: http://localhost:8080/docs/api.json
+            FILTER: "true"
+            DEEP_LINKING: "true"
+            DISPLAY_OPERATION_ID: "true"
+        depends_on:
+            - app
