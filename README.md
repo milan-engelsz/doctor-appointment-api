@@ -1,5 +1,7 @@
 # Doctor appointment API
 
+[![Tests](https://github.com/milan-engelsz/doctor-appointment-api/actions/workflows/tests.yml/badge.svg)](https://github.com/milan-engelsz/doctor-appointment-api/actions/workflows/tests.yml)
+
 Laravel REST API take-home for a job application: doctors publish availability, patients book free slots, appointments move through a status lifecycle. **Backend only** — no Vue / SPA.
 
 Built against a written brief (entities, overlap rules, free-slot listing, confirm / complete / cancel with a 24h rule on confirmed → cancelled).
